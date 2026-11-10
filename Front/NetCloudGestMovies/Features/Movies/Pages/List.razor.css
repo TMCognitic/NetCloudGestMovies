@@ -1,0 +1,9 @@
+﻿tr.default > td {
+    background-color: lightblue;
+}
+
+tr.selected > td {
+    background-color: lightgreen;
+}
+
+

@@ -1,0 +1,4 @@
+<Solution>
+  <Project Path="NetCloudGestMovies/NetCloudGestMovies.csproj" />
+  <Project Path="Tools/Tools.csproj" Id="6c91a3b1-d15d-49b0-b22e-e645d13d8017" />
+</Solution>

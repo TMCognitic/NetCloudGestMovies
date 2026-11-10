@@ -1,0 +1,60 @@
+﻿@attribute [Route(Routes.Details)]
+@inject IFilmRepository repository
+@inject NavigationManager nav
+
+@if(_entity is null)
+{
+    <h3>Loading ...</h3>
+}
+else
+{
+    <h3>Details</h3>
+
+    <div class="col-md-4">
+        <h4>Film sélectionné</h4>
+        <hr />
+        <dl>
+            <dt class="col-sm-3">Id :</dt>
+            <dd class="col-sm-9">
+                @_entity.Id
+            </dd>
+            <dt class="col-sm-3">
+                Titre :
+            </dt>
+            <dd class="col-sm-9">
+                @_entity.Titre
+            </dd>
+            <dt class="col-sm-3">
+                Année :
+            </dt>
+            <dd class="col-sm-9">
+                @_entity.Annee
+            </dd>
+        </dl>
+    </div>
+}
+
+<NavLink href="@Routes.Movies">
+    Retour à la liste
+</NavLink>
+
+
+@code {
+    private Film? _entity;
+
+    [Parameter]
+    public int Id { get; set; }
+
+    protected override void OnInitialized()
+    {
+        Result<Film> result = repository.Handle(new GetFilmByIdQuery(Id));
+
+        if (result.IsFailure)
+        {
+            nav.NavigateTo("movies");
+            return;
+        }
+
+        _entity = result.Data;
+    }
+}

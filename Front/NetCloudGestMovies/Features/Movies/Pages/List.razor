@@ -1,0 +1,91 @@
+﻿@attribute [Route(Routes.Movies)]
+
+@inject IHttpClientFactory factory;
+
+@inject IFilmRepository repository;
+@inject NavigationManager nav;
+@inject IJSRuntime jsRuntime; 
+
+<h3>Movies</h3>
+
+@if(_films is not null)
+{
+    <div class="row">
+        <div class="@(SelectedFilm is null ? "col-md-12" : "col-md-8")">
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>Id</th>
+                        <th>Titre</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach(Film film in _films)
+                    {
+                        <tr class="@(film == SelectedFilm ? "selected" : "")" @onclick="() => OnRowClick(film)">
+                            <td>@film.Id</td>
+                            <td>@film.Titre</td>
+                            <button @onclick="() => OnDetails(film.Id)">Détails</button>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+        @if(SelectedFilm is not null)
+        {
+            <div class="col-md-4">
+                <h4>Film sélectionné</h4>
+                <hr />
+                <dl>
+                    <dt class="col-sm-3">Id :</dt>
+                    <dd class="col-sm-9">
+                        @SelectedFilm.Id
+                    </dd>
+                    <dt class="col-sm-3">
+                        Titre :
+                    </dt>
+                    <dd class="col-sm-9">
+                        @SelectedFilm.Titre
+                    </dd>
+                    <dt class="col-sm-3">
+                        Année :
+                    </dt>
+                    <dd class="col-sm-9">
+                        @SelectedFilm.Annee
+                    </dd>
+                </dl>
+            </div>
+        }
+    </div>
+}
+
+@code {
+    private readonly IEnumerable<Film> _films;
+    private Film? SelectedFilm = null;
+
+
+    protected override async Task OnInitializedAsync()
+    {
+        HttpClient httpClient = factory.CreateClient("api");
+        HttpResponseMessage httpResponseMessage = await httpClient.GetAsync("health");
+
+        await jsRuntime.InvokeVoidAsync("alert", httpResponseMessage.StatusCode);
+    }
+
+
+    public List(IList<Film> films)
+    {
+        _films = films;
+    }
+
+    private void OnRowClick(Film film)
+    {
+        SelectedFilm = film;
+    }
+
+    private void OnDetails(int id)
+    {
+        nav.NavigateTo($"{Routes.Movies}/{id}");
+    }
+}
