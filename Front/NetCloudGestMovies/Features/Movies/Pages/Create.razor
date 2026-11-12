@@ -1,0 +1,94 @@
+﻿@attribute [Route(Routes.Create)]
+<PageTitle>Créer film</PageTitle>
+
+@inject ILogger<Create> logger
+
+<h3>Créer un film</h3>
+
+@* <EditForm Model="_form" OnValidSubmit="OnSubmit">
+    <DataAnnotationsValidator />
+    <ValidationSummary Model="_form" />
+    <div class="form-group">
+        <label class="control-label">Titre :</label>
+        <InputText @bind-Value="_form.Titre" class="form-control" />
+        <ValidationMessage For="() => _form.Titre" class="text-danger" />
+    </div>
+    <div class="form-group">
+        <label class="control-label">Annee :</label>
+        <InputNumber @bind-Value="_form.Annee" class="form-control" />
+        <ValidationMessage For="() => _form.Annee" class="text-danger" />
+    </div>
+    <div class="form-group">
+        <input type="submit" value="Créer" class="btn btn-primary" /> |
+        <a href="/" class="btn btn-secondary">Retour à la liste</a>
+    </div>
+</EditForm> *@
+
+
+<EditForm EditContext="_editContext" OnValidSubmit="OnSubmit">
+    <DataAnnotationsValidator />
+    <ValidationSummary Model="_form" />
+    <div class="form-group">
+        <label class="control-label">Titre :</label>
+        <InputText @bind-Value="_form.Titre" class="form-control" />
+        <ValidationMessage For="() => _form.Titre" class="text-danger" />
+    </div>
+    <div class="form-group">
+        <label class="control-label">Confirmation :</label>
+        <InputText @bind-Value="_form.ConfirmTitre" class="form-control" />
+        <ValidationMessage For="() => _form.ConfirmTitre" class="text-danger" />
+    </div>
+    <div class="form-group">
+        <label class="control-label">Annee :</label>
+        <InputNumber @bind-Value="_form.Annee" class="form-control" />  
+        <ValidationMessage For="() => _form.Annee" class="text-danger" />
+    </div>
+    <div class="form-group">
+        <input type="submit" value="Créer" class="btn btn-primary" /> |
+        <a href="/" class="btn btn-secondary">Retour à la liste</a>
+    </div>
+</EditForm>
+
+@code {
+    private CreateMovieForm _form = new CreateMovieForm();
+    private EditContext _editContext = default!;
+    private ValidationMessageStore _validationMessageStore = default!;
+
+    protected override void OnInitialized()
+    {
+        _editContext = new EditContext(_form);
+        _validationMessageStore = new ValidationMessageStore(_editContext);
+
+        _editContext.OnFieldChanged += (sender, e) => ValidateFields(_editContext, _validationMessageStore, e.FieldIdentifier);
+    }
+
+    private void ValidateFields(EditContext s, ValidationMessageStore validationMessageStore, FieldIdentifier fieldIdentifier)
+    {
+        validationMessageStore.Clear();
+
+        if(_form.Annee is 2000)
+        {
+            validationMessageStore.Add(_editContext.Field(nameof(CreateMovieForm.Annee)), "Les films des année 2000 ne sont pas autorisé!");
+        }
+    }
+
+    private void OnSubmit()
+    {
+        logger.LogInformation(JsonSerializer.Serialize(_form));
+
+        //Call à votre API 
+    }
+
+    private class CreateMovieForm
+    {
+        [Required]
+        [MinLength(1)]
+        public string Titre { get; set; } = string.Empty;
+
+        [Compare(nameof(Titre))]
+        public string ConfirmTitre { get; set; } = string.Empty;
+
+        [Range(1830, 9999)]
+        public int Annee { get; set; }
+    }
+}
