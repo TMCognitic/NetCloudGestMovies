@@ -7,6 +7,7 @@ var builder = WebAssemblyHostBuilder.CreateDefault(args);
 builder.RootComponents.Add<App>("#app");
 builder.RootComponents.Add<HeadOutlet>("head::after");
 
+//builder.Services.AddValidation(); // Uniquement si validation imbriquée
 builder.Services.AddHttpClient("api", o => { o.BaseAddress = new Uri("https://localhost:7217/api/"); });
 builder.Services.AddSingleton<IList<Film>>(sp => new List<Film>
 {
